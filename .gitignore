@@ -1,0 +1,3 @@
+db.sqlite3
+tests/functional/geckodriver.log
+superlists/__pycache__/
