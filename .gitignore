@@ -1,4 +1,4 @@
 db.sqlite3
 tests/functional/geckodriver.log
-superlists/__pycache__/
+__pycache__
 *.swp
