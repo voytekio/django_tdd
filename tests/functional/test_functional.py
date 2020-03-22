@@ -2,12 +2,13 @@
 import pdb
 import pytest
 import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 
 @pytest.fixture()
 def browser():
     print('\nFIXTURE SETUP(browser)')
-    from selenium import webdriver
     browser = webdriver.Firefox()
     yield browser
     print('\nFIXTURE TEARDOWN(browser)')
@@ -24,11 +25,29 @@ class Test_Webpage():
         # we want the page title and header mention to-do lists
         assert 'To-Do' in browser.title
         #self.assertIn ('To_Do', self.browser.title)
-        assert 'nope' in 'Finish the test!'
+
+        # we should see header mention todo lists
+        header_text = browser.find_element_by_tag_name('h1').text
+        assert 'To-Do' in header_text
 
         # there must be an input form with a text box
+        inputbox = browser.find_element_by_id('id_new_item')
+        assert inputbox.get_attribute('placeholder') == 'Enter a to-do item'
+
+        # we should be able to type into a text box
+        inputbox.send_keys('Buy peacock feathers')
 
         # when you hit enter, the page updates and lists the item you entered
+        inputbox.send_keys(Keys.ENTER)
+        time.sleep(1)
+
+        table = browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        assert any(row.text == '1: Buy peacock feathers' for row in rows)
+
+        # there is still a text box inviting to add another item.
+        # we'll add 'Use peacock feathers to make a fly' (being very methodical)
+        assert 'nope' in 'Finish the test!'
 
         # page should list as many items as the user puts int using the form
 
