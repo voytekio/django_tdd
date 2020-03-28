@@ -24,7 +24,6 @@ class Test_Webpage():
 
         # we want the page title and header mention to-do lists
         assert 'To-Do' in browser.title
-        #time.sleep(5)
         #self.assertIn ('To_Do', self.browser.title)
 
         # we should see header mention todo lists
@@ -36,6 +35,7 @@ class Test_Webpage():
         assert inputbox.get_attribute('placeholder') == 'Enter a to-do item'
 
         # we should be able to type into a text box
+        #time.sleep(3)
         inputbox.send_keys('Buy peacock feathers')
 
         # when you hit enter, the page updates and lists the item you entered
