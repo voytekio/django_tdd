@@ -12,7 +12,7 @@ def browser():
     browser = webdriver.Firefox()
     yield browser
     print('\nFIXTURE TEARDOWN(browser)')
-    #time.sleep(1)
+    time.sleep(2)
     browser.quit()
 
 class Test_Webpage():
@@ -24,6 +24,7 @@ class Test_Webpage():
 
         # we want the page title and header mention to-do lists
         assert 'To-Do' in browser.title
+        #time.sleep(5)
         #self.assertIn ('To_Do', self.browser.title)
 
         # we should see header mention todo lists
