@@ -12,10 +12,16 @@ def browser():
     browser = webdriver.Firefox()
     yield browser
     print('\nFIXTURE TEARDOWN(browser)')
-    time.sleep(3)
+    time.sleep(2)
     browser.quit()
 
 class Test_Webpage():
+    def some_func(self, text, browser2):
+        #pdb.set_trace()
+        table = browser2.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        assert text in [row.text for row in rows]
+
     def test_can_start_a_list_and_retrieve_it_later(self, browser):
         #pdb.set_trace()
 
@@ -35,17 +41,18 @@ class Test_Webpage():
         assert inputbox.get_attribute('placeholder') == 'Enter a to-do item'
 
         # we should be able to type into a text box
-        time.sleep(2)
+        time.sleep(1)
         inputbox.send_keys('Buy peacock feathers')
 
         # when you hit enter, the page updates and lists the item you entered
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
+        #table = browser.find_element_by_id('id_list_table')
+        #rows = table.find_elements_by_tag_name('tr')
         #assert any(row.text == '1: Buy peacock feathers' for row in rows)
-        assert '1: Buy peacock feathers' in [row.text for row in rows]
+        #assert '1: Buy peacock feathers' in [row.text for row in rows]
+        self.some_func('1: Buy peacock feathers', browser)
         #assert any(row.text == '1: Buy peacock feathers' for row in rows), f"New to-do item did not appear in table. Contents were:\n{table.text}"
 
         # there is still a text box inviting to add another item.
@@ -57,10 +64,10 @@ class Test_Webpage():
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
-        table = browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
         #assert any(row.text == '1: Buy peacock feathers' for row in rows)
-        assert '2: Use peacock feathers to make a fly' in [row.text for row in rows]
+        self.some_func('1: Buy peacock feathers', browser)
+        self.some_func('2: Use peacock feathers to make a fly', browser)
+        #assert '2: Use peacock feathers to make a fly' in [row.text for row in rows]
 
         # page should list as many items as the user puts int using the form
         assert 'nope' in 'Finish the test!'
