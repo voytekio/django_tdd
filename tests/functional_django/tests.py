@@ -4,9 +4,10 @@ import pytest
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException
 from django.test import LiveServerTestCase
 
-
+MAX_WAIT = 10
 
 '''
 @pytest.fixture()
@@ -27,11 +28,20 @@ class Test_Webpage(LiveServerTestCase):
     def tearDown(self):
         self.browser.quit()
 
-    def assert_in_html_table(self, text):
+    def wait_for_row_in_list_table(self, text):
+        start_time = time.time()
         #pdb.set_trace()
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(text, [row.text for row in rows])
+        while True:
+            try:
+                table = self.browser.find_element_by_id('id_list_table')
+                rows = table.find_elements_by_tag_name('tr')
+                self.assertIn(text, [row.text for row in rows])
+                return
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > MAX_WAIT:
+                    raise e
+                print('RETRYING: {}'.format(e.__class__))
+                time.sleep(0.5)
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         #pdb.set_trace()
@@ -53,18 +63,16 @@ class Test_Webpage(LiveServerTestCase):
         assert inputbox.get_attribute('placeholder') == 'Enter a to-do item'
 
         # we should be able to type into a text box
-        time.sleep(1)
         inputbox.send_keys('Buy peacock feathers')
 
         # when you hit enter, the page updates and lists the item you entered
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         #table = browser.find_element_by_id('id_list_table')
         #rows = table.find_elements_by_tag_name('tr')
         #assert any(row.text == '1: Buy peacock feathers' for row in rows)
         #assert '1: Buy peacock feathers' in [row.text for row in rows]
-        self.assert_in_html_table('1: Buy peacock feathers')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
         #assert any(row.text == '1: Buy peacock feathers' for row in rows), f"New to-do item did not appear in table. Contents were:\n{table.text}"
 
         # there is still a text box inviting to add another item.
@@ -73,11 +81,10 @@ class Test_Webpage(LiveServerTestCase):
         inputbox.send_keys('Use peacock feathers to make a fly')
         # when you hit enter, the page updates and lists the item you entered
         inputbox.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         #assert any(row.text == '1: Buy peacock feathers' for row in rows)
-        self.assert_in_html_table('1: Buy peacock feathers')
-        self.assert_in_html_table('2: Use peacock feathers to make a fly')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        self.wait_for_row_in_list_table('2: Use peacock feathers to make a fly')
         #assert '2: Use peacock feathers to make a fly' in [row.text for row in rows]
 
         # page should list as many items as the user puts int using the form
