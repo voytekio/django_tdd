@@ -1,0 +1,5 @@
+psutil #for fixture management to exit the django app
+pytest
+gunicorn #for productionizing
+selenium # for browser based testing
+Django #core of the app

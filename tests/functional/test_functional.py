@@ -1,50 +1,36 @@
 # import unittest
+import os
 import pdb
 import pytest
 import time
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
+import psutil
 from subprocess import Popen, PIPE
 import shlex
 
-def run_cmd(cmd, returnstring):
+def run_cmd(cmd):
     #log.debug('cmd is: {0}'.format(cmd))
-    #log.debug('returnstring is: {0}'.format(returnstring))
     cmdplus = shlex.split(cmd)
-    #pdb.set_trace()
-    try:
-        process = Popen(cmdplus, stdout=PIPE)
-        #cmdoutput = process.communicate()
-    except OSError as err:
-        log.error('OS Exception occurred: {}'.format(err))
-        return 1
-    #exitcode = process.wait()
-    #log.debug('cmd output is: {0}'.format(cmdoutput))
-    # log.debug('exitcode is: {0}'.format(exitcode))
-    return 0
-    '''
-    if returnstring in str(cmdoutput[0]):
-        log.debug('Found success_string in return')
-        return 0
-    else:
-        log.debug('Unable to find success_string "{}" in cmd output'.format(returnstring))
-        return 1
-    '''
+    process = Popen(cmdplus, stdout=PIPE)
+    return process.pid
 
 @pytest.fixture()
 def srv():
     print('\nFIXTURE SETUP(SRV)')
-    #pdb.set_trace()
-    cmdline = '/Users/vkrudysz/venvs/tddbook/bin/python /Users/vkrudysz/code/django_tdd/manage.py runserver'
-    foo = run_cmd(cmdline, 'foo_string')
-    time.sleep(2)
-
-    #browser = webdriver.Firefox()
+    cwd = os.getcwd()
+    cmdline = 'python {}/manage.py runserver'.format(cwd)
+    pid = run_cmd(cmdline)
+    time.sleep(1)
     yield 0
+
     print('\nFIXTURE TEARDOWN(SRV)')
-    time.sleep(2)
-    #browser.quit()
+    parent = psutil.Process(pid)
+    for child in parent.children():
+        child.terminate()
+    time.sleep(1)
 
 @pytest.fixture()
 def browser():
@@ -110,7 +96,7 @@ class Test_Webpage():
         #assert '2: Use peacock feathers to make a fly' in [row.text for row in rows]
 
         # page should list as many items as the user puts int using the form
-        assert 'nope' in 'Finish the test!'
+        assert 'Complete' in 'Finish the test!'
 
         # there should be a unique URL for each list
 
