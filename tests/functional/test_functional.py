@@ -8,21 +8,32 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 import psutil
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, check_output
 import shlex
 
-def run_cmd(cmd):
+def run_cmd(cmd, blocking=True):
     #log.debug('cmd is: {0}'.format(cmd))
     cmdplus = shlex.split(cmd)
-    process = Popen(cmdplus, stdout=PIPE)
-    return process.pid
+
+    if blocking:
+        return check_output(cmdplus)
+    else:
+        process = Popen(cmdplus, stdout=PIPE)
+        return process.pid
 
 @pytest.fixture()
 def srv():
     print('\nFIXTURE SETUP(SRV)')
     cwd = os.getcwd()
+
+    # delete and re-migrate the db
+    res = run_cmd('rm {}/db.sqlite3'.format(cwd))
+    res = run_cmd('python {}/manage.py migrate --noinput'.format(cwd))
+    time.sleep(1)
+
+    # start web server
     cmdline = 'python {}/manage.py runserver'.format(cwd)
-    pid = run_cmd(cmdline)
+    pid = run_cmd(cmdline, blocking=False)
     time.sleep(1)
     yield 0
 
