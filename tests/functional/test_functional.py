@@ -112,40 +112,49 @@ class Test_Webpage():
 
         # page should list as many items as the user puts int using the form
 
-    def test_user_gets_separate_url(self, browser, srv):
+    def test_user_gets_separate_url(self, srv):
         # edith starts a new to-do list
-        browser.get('http://localhost:8000')
-        inputbox = browser.find_element_by_id('id_new_item')
+
+        #pdb.set_trace()
+
+        # since we want to quit browser in the middle of tests
+        # we cannot use a fixture, so we create all the browser 
+        # objects ourselves here inside the test. 
+        # as a result we don't benefit from fixture advantages
+        # such as when exception happens during the test, then the
+        # fixture is not cleaned
+        browser3 = webdriver.Firefox()
+        browser3.get('http://localhost:8000')
+        inputbox = browser3.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy peacock feathers')
-        time.sleep(1)
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy peacock feathers', browser)
+        self.wait_for_row_in_list_table('1: Buy peacock feathers', browser3)
         time.sleep(1)
 
         # she notices that her list has a unique URL
-        edith_list_url = browser.current_url
+        edith_list_url = browser3.current_url
         assert re.match(r'/lists/.+', edith_list_url)
         #self.assertRegex(edith_list_url, '/lists/.+')
 
         # now a new user, Francis, comes along to the site.
+        browser3.quit()
+        browser3 = webdriver.Firefox()
+        browser3.get('http://localhost:8000')
 
-    def test_multiple_users_can_start_lists_at_different_urls(self, browser, srv):
-        browser.get('http://localhost:8000')
-
-        page_text = browser.find_element_by_tag_name('body').text
+        page_text = browser3.find_element_by_tag_name('body').text
         assert 'Buy peackock feathers' not in page_text
         assert 'make a fly' not in page_text
 
         # francis starts a new list by entering a new item
-        inputbox = browser.find_element_by_id('id_new_item')
+        inputbox = browser3.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy milk')
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy milk', browser)
+        self.wait_for_row_in_list_table('1: Buy milk', browser3)
 
         # francis gets his own uniqure URL
-        francis_list_url = browser.current_url
+        francis_list_url = browser3.current_url
         assert re.match(r'/lists/.+', francis_list_url)
-        #assert francis_list_url != edith_list_url
+        assert francis_list_url != edith_list_url
 
         page_text = browser.find_element_by_tag_name('body').text
         assert 'Buy peackock feathers' not in page_text
