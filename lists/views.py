@@ -16,6 +16,9 @@ def home_page(request):
         #item_orm = Item()
         #item_orm.text = request_post.get('item_text', '')
         #item_orm.save()
-        return redirect('/')
-    return render(request, 'home.html', {'items':Item.objects.all()})
+        return redirect('/lists/the-only-list-in-the-world/')
+    return render(request, 'home.html')
     #return HttpResponse('<html><title>To-Do lists</title></html>')
+
+def view_list(request):
+    return render(request, 'list.html', {'items':Item.objects.all()})

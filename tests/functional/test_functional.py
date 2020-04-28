@@ -92,6 +92,7 @@ class Test_Webpage():
         assert inputbox.get_attribute('placeholder') == 'Enter a to-do item'
 
         # we should be able to type into a text box
+        #pdb.set_trace()
         inputbox.send_keys('Buy peacock feathers')
 
         # when you hit enter, the page updates and lists the item you entered
@@ -133,7 +134,7 @@ class Test_Webpage():
 
         # she notices that her list has a unique URL
         edith_list_url = browser3.current_url
-        assert re.match(r'/lists/.+', edith_list_url)
+        assert re.search(r'/lists/.+', edith_list_url)
         #self.assertRegex(edith_list_url, '/lists/.+')
 
         # now a new user, Francis, comes along to the site.
@@ -153,7 +154,7 @@ class Test_Webpage():
 
         # francis gets his own uniqure URL
         francis_list_url = browser3.current_url
-        assert re.match(r'/lists/.+', francis_list_url)
+        assert re.search(r'/lists/.+', francis_list_url)
         assert francis_list_url != edith_list_url
 
         page_text = browser.find_element_by_tag_name('body').text
