@@ -157,11 +157,12 @@ class Test_Webpage():
         assert re.search(r'/lists/.+', francis_list_url)
         assert francis_list_url != edith_list_url
 
-        page_text = browser.find_element_by_tag_name('body').text
+        page_text = browser3.find_element_by_tag_name('body').text
         assert 'Buy peackock feathers' not in page_text
         assert 'Buy milk' in page_text
 
-        assert 'Complete' in 'Finish the test!'
+        #assert 'Complete' in 'Finish the test!'
+        browser3.quit()
 
 
 #if __name__ == '__main__':
