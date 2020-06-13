@@ -75,31 +75,7 @@ class Test_Webpage():
                 print('RETRYING: {}'.format(e.__class__))
                 time.sleep(0.5)
 
-    def test_layout_and_styling(self, browser, srv):
-        # edith goes to the home page
-        browser.get('http://localhost:8000')
-        #pdb.set_trace()
-        win_size_x = 1024
-        win_size_y = 768
-        browser.set_window_size(win_size_x, win_size_y)
-        inputbox = browser.find_element_by_id('id_new_item')
-
-        # she notices the input box is nicely centered
-        centered_x = win_size_x/2 - inputbox.size['width']/2
-        assert int(abs(inputbox.location['x'] - centered_x)) < 10 # allow
-        # for few pixels in case scrollbars show up
-
-        # she starts a new list and sees the input is
-        # nicely centered there too
-        inputbox.send_keys('testing')
-        inputbox.send_keys(Keys.ENTER)
-        self._wait_for_row_in_list_table('1: testing', browser)
-        inputbox_for_list = browser.find_element_by_id('id_new_item')
-
-        actual_center = inputbox_for_list.location['x'] + inputbox_for_list.size['width']/2
-        assert int(abs(actual_center - (win_size_x/2))) < 10
-
-    @pytest.mark.skip(reason='temprarily exclude for perf reasons')
+    #@pytest.mark.skip(reason='temprarily exclude for perf reasons')
     def test_can_start_a_list_for_one_user(self, browser, srv):
         #pdb.set_trace()
 
@@ -140,7 +116,7 @@ class Test_Webpage():
 
         # page should list as many items as the user puts int using the form
 
-    @pytest.mark.skip(reason='temprarily exclude for perf reasons')
+    #@pytest.mark.skip(reason='temprarily exclude for perf reasons')
     def test_user_gets_separate_url(self, srv):
         # edith starts a new to-do list
 
@@ -191,6 +167,31 @@ class Test_Webpage():
 
         #assert 'Complete' in 'Finish the test!'
         browser3.quit()
+
+
+    def test_layout_and_styling(self, browser, srv):
+        # edith goes to the home page
+        browser.get('http://localhost:8000')
+        #pdb.set_trace()
+        win_size_x = 1024
+        win_size_y = 768
+        browser.set_window_size(win_size_x, win_size_y)
+        inputbox = browser.find_element_by_id('id_new_item')
+
+        # she notices the input box is nicely centered
+        centered_x = win_size_x/2 - inputbox.size['width']/2
+        assert int(abs(inputbox.location['x'] - centered_x)) < 10 # allow
+        # for few pixels in case scrollbars show up
+
+        # she starts a new list and sees the input is
+        # nicely centered there too
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self._wait_for_row_in_list_table('1: testing', browser)
+        inputbox_for_list = browser.find_element_by_id('id_new_item')
+
+        actual_center = inputbox_for_list.location['x'] + inputbox_for_list.size['width']/2
+        assert int(abs(actual_center - (win_size_x/2))) < 10
 
 
 #if __name__ == '__main__':
