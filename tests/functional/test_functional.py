@@ -57,6 +57,10 @@ def browser():
     time.sleep(2)
     browser.quit()
 
+@pytest.fixture()
+def target_url():
+    staging_server = os.environ.get('STAGING_SERVER') if os.environ.get('STAGING_SERVER') else 'localhost:8000'
+    yield 'http://{}'.format(staging_server)
 
 
 class Test_Webpage():
@@ -76,11 +80,11 @@ class Test_Webpage():
                 time.sleep(0.5)
 
     #@pytest.mark.skip(reason='temprarily exclude for perf reasons')
-    def test_can_start_a_list_for_one_user(self, browser, srv):
+    def test_can_start_a_list_for_one_user(self, browser, srv, target_url):
         #pdb.set_trace()
 
         # we want to check the homepage
-        browser.get('http://localhost:8000')
+        browser.get(target_url)
 
         # we want the page title and header mention to-do lists
         assert 'To-Do' in browser.title
@@ -117,7 +121,7 @@ class Test_Webpage():
         # page should list as many items as the user puts int using the form
 
     #@pytest.mark.skip(reason='temprarily exclude for perf reasons')
-    def test_user_gets_separate_url(self, srv):
+    def test_user_gets_separate_url(self, srv, target_url):
         # edith starts a new to-do list
 
         #pdb.set_trace()
@@ -129,7 +133,7 @@ class Test_Webpage():
         # such as when exception happens during the test, then the
         # fixture is not cleaned
         browser3 = webdriver.Firefox()
-        browser3.get('http://localhost:8000')
+        browser3.get(target_url)
         inputbox = browser3.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy peacock feathers')
         inputbox.send_keys(Keys.ENTER)
@@ -144,7 +148,7 @@ class Test_Webpage():
         # now a new user, Francis, comes along to the site.
         browser3.quit()
         browser3 = webdriver.Firefox()
-        browser3.get('http://localhost:8000')
+        browser3.get(target_url)
 
         page_text = browser3.find_element_by_tag_name('body').text
         assert 'Buy peackock feathers' not in page_text
@@ -169,9 +173,9 @@ class Test_Webpage():
         browser3.quit()
 
 
-    def test_layout_and_styling(self, browser, srv):
+    def test_layout_and_styling(self, browser, srv, target_url):
         # edith goes to the home page
-        browser.get('http://localhost:8000')
+        browser.get(target_url)
         #pdb.set_trace()
         win_size_x = 1024
         win_size_y = 768
@@ -192,7 +196,6 @@ class Test_Webpage():
 
         actual_center = inputbox_for_list.location['x'] + inputbox_for_list.size['width']/2
         assert int(abs(actual_center - (win_size_x/2))) < 10
-
 
 #if __name__ == '__main__':
 #    unittest.main(warnings='ignore')
