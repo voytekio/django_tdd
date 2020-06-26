@@ -31,21 +31,25 @@ def srv():
     cwd = os.getcwd()
 
     # delete and re-migrate the db
-    res = run_cmd('rm {}/db.sqlite3'.format(cwd))
-    res = run_cmd('python {}/manage.py migrate --noinput'.format(cwd))
-    time.sleep(1)
+    if os.environ.get('STAGING_SERVER'):
+        yield 0
+    else:
+        res = run_cmd('rm {}/db.sqlite3'.format(cwd))
+        res = run_cmd('python {}/manage.py migrate --noinput'.format(cwd))
+        time.sleep(1)
 
-    # start web server
-    cmdline = 'python {}/manage.py runserver'.format(cwd)
-    pid = run_cmd(cmdline, blocking=False)
-    time.sleep(1)
-    yield 0
+        # start web server
+        cmdline = 'python {}/manage.py runserver'.format(cwd)
+        pid = run_cmd(cmdline, blocking=False)
+        time.sleep(1)
+        yield 0
 
     print('\nFIXTURE TEARDOWN(SRV)')
-    parent = psutil.Process(pid)
-    for child in parent.children():
-        child.terminate()
-    time.sleep(1)
+    if not os.environ.get('STAGING_SERVER'):
+        parent = psutil.Process(pid)
+        for child in parent.children():
+            child.terminate()
+        time.sleep(1)
 
 @pytest.fixture()
 def browser():
