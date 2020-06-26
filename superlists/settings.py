@@ -25,7 +25,8 @@ SECRET_KEY = 'ptmkt%2io2#k=2lg(%ej#u94xmyns@bq$$!a7uhp#7gb^m6-8a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = []
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 #ALLOWED_HOSTS = ['testserver']
 
