@@ -19,13 +19,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
+# SECURITY SETTINGS - controlled via env var
+if 'DJANGO_PROD' in os.environ:
+	DEBUG = False
+	SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+	ALLOWED_HOSTS = [os.environ['SITENAME']]  # I believe this is needs to match Host Header field
+else:
+	DEBUG = True
+	SECRET_KEY = 'insecure-key-for-dev'
+	ALLOWED_HOSTS = []
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'ptmkt%2io2#k=2lg(%ej#u94xmyns@bq$$!a7uhp#7gb^m6-8a'
-
+#SECRET_KEY = 'ptmkt%2io2#k=2lg(%ej#u94xmyns@bq$$!a7uhp#7gb^m6-8a'
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+#DEBUG = True
+#ALLOWED_HOSTS = ['*']
 #ALLOWED_HOSTS = []
 #ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
 #ALLOWED_HOSTS = ['testserver']
